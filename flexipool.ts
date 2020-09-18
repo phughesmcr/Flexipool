@@ -43,7 +43,7 @@ export class Pool<T extends Poolable> {
   };
 
   /** The pool's configuration */
-  private _config: PoolConfig = Pool.defaultConfig;
+  private _config: PoolConfig = { ...Pool.defaultConfig };
 
   /** The array of available objects */
   private _objects: T[] = [];
@@ -122,7 +122,7 @@ export class Pool<T extends Poolable> {
    */
   expandBy(size: number): this {
     // Bail early if the pool is already at maximum capacity
-    if (size == null || typeof size !== 'number' || this.atMax === true) {
+    if (size == null || typeof size !== "number" || this.atMax === true) {
       return this;
     }
     // Grow to available space if near maximum capacity
@@ -172,7 +172,7 @@ export class Pool<T extends Poolable> {
    * @param size The desired capacity
    */
   resizeTo(size: number): this {
-    if (size == null || typeof size !== 'number') return this;
+    if (size == null || typeof size !== "number") return this;
     if (size !== this._size) {
       if (size > this._size) {
         size = (size - this._size);
@@ -202,7 +202,7 @@ export class Pool<T extends Poolable> {
     }
     if (changedMin) {
       if (this._size < this.config.min) {
-        this.expandBy(this.config.min - this._size)
+        this.expandBy(this.config.min - this._size);
       }
     }
     return this;
@@ -215,7 +215,7 @@ export class Pool<T extends Poolable> {
    */
   shrinkBy(size: number): this {
     // Bail early if the pool is already at minimum capacity
-    if (size == null || typeof size !== 'number' || this.atMin === true) {
+    if (size == null || typeof size !== "number" || this.atMin === true) {
       return this;
     }
     // Grow to available space if near maximum capacity
