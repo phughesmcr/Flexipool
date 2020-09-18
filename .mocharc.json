@@ -1,6 +1,6 @@
 {
   "ignore": [
-    "./test/mocha.env.js"
+    "test/mocha.env.js"
   ],
   "require": [
     "test/mocha.env.js",
