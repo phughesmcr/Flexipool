@@ -1,4 +1,6 @@
 export interface PoolConfig {
+    /** Print console messages to aid debugging */
+    debug: boolean;
     /**
      * Percentage to attempt to expand the pool by,
      * if pool is at capacity but not at maximum capacity
@@ -11,8 +13,12 @@ export interface PoolConfig {
      * The minimum available objects is always 0.
      */
     min: number;
-    /** The maximum capacity of the pool. Undefined = no limit. */
-    max?: number;
+    /**
+     * The maximum capacity of the pool.
+     *
+     * Default = Number.POSITIVE_INFINITY
+     */
+    max: number;
     /**
      * Recycle the pool elements if maximum capacity is reached.
      *
@@ -50,8 +56,10 @@ export declare class Pool<T extends Poolable> {
     get available(): number;
     /** A clone of the pool's config object */
     get config(): PoolConfig;
-    /** The pool's maximum capacity. Undefined = no limit. */
-    get max(): number | undefined;
+    /** Is debug mode enabled? */
+    get debug(): boolean;
+    /** The pool's maximum capacity. */
+    get max(): number;
     /** The pool's minimum capacity */
     get min(): number;
     /** The total capacity of the pool */
