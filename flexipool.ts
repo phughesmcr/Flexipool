@@ -16,8 +16,12 @@ export interface PoolConfig {
    */
   min: number;
 
-  /** The maximum capacity of the pool. Undefined = no limit. */
-  max?: number;
+  /**
+   * The maximum capacity of the pool.
+   *
+   * Default = Number.POSITIVE_INFINITY
+   */
+  max: number;
 
   /**
    * Recycle the pool elements if maximum capacity is reached.
@@ -39,6 +43,7 @@ export class Pool<T extends Poolable> {
   static defaultConfig: PoolConfig = {
     expandFactor: 0.2, // i.e. expand by 20%
     min: 2,
+    max: Number.POSITIVE_INFINITY,
     recycle: false,
   };
 
@@ -84,8 +89,8 @@ export class Pool<T extends Poolable> {
     return { ...this._config };
   }
 
-  /** The pool's maximum capacity. Undefined = no limit. */
-  get max(): number | undefined {
+  /** The pool's maximum capacity. */
+  get max(): number {
     return this._config.max;
   }
 
@@ -187,16 +192,46 @@ export class Pool<T extends Poolable> {
 
   /** Update the pool's configuration */
   setConfig(config: Partial<PoolConfig>): this {
-    if (config.min && config.min < 1) config.min = 1;
-    const changedMin = config.min !== this.config.min;
-    const changedMax = config.max !== this.config.max;
+    // validate input
+    if (!config) return this;
+    if (config.min != null) {
+      if (typeof config.min !== "number") {
+        delete config.min;
+      } else if (config.min <= 0) {
+        config.min = 1;
+      }
+    }
+    if (config.max != null) {
+      if (typeof config.max !== "number") {
+        delete config.max;
+      } else if (
+        config.max <
+          (config.min != null ? config.min : this._config.min)
+      ) {
+        delete config.max;
+      }
+    }
+    if (
+      config.expandFactor != null &&
+      typeof config.expandFactor !== "number"
+    ) {
+      delete config.expandFactor;
+    }
+    if (config.recycle && typeof config.recycle !== "boolean") {
+      delete config.recycle;
+    }
+    // detect changes to min/max
+    const changedMin = config.min && config.min !== this.config.min;
+    const changedMax = config.max && config.max !== this.config.max;
+    // merge config
     this._config = {
       ...Pool.defaultConfig,
       ...this._config,
       ...config,
     };
+    // adapt pool if min/max have changed
     if (changedMax) {
-      if (this._config.max && this._size > this._config.max) {
+      if (this._size > this._config.max) {
         this.shrinkBy(this._size - this._config.max);
       }
     }

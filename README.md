@@ -69,7 +69,7 @@ This is the minimum capacity, not the minimum available objects. The minimum ava
 
 ### max
 
-The maximum capacity of the pool. Undefined = no limit.
+The maximum capacity of the pool. Defaults to infinity.
 
 ### recycle
 
