@@ -82,7 +82,9 @@
 
 <span class="hljs-keyword">const</span> pool: Pool&lt;Entity&gt; = <span class="hljs-keyword">new</span> Pool(Entity);
 
-pool.get() <span class="hljs-comment">// returns an Entity</span>
+<span class="hljs-keyword">const</span> item = pool.get(); <span class="hljs-comment">// returns an Entity</span>
+
+pool.release(item);
 </code></pre>
 				<a href="#javascript--browser" id="javascript--browser" style="color: inherit; text-decoration: none;">
 					<h3>Javascript / Browser</h3>
@@ -98,11 +100,17 @@ pool.get() <span class="hljs-comment">// returns an Entity</span>
 
 <span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> Pool(Entity);
 
-pool.get() <span class="hljs-comment">// returns an Entity</span></code></pre>
+<span class="hljs-keyword">const</span> item = pool.get(); <span class="hljs-comment">// returns an Entity</span>
+
+pool.release(item);</code></pre>
 				<a href="#testing" id="testing" style="color: inherit; text-decoration: none;">
 					<h3>Testing</h3>
 				</a>
 				<pre><code class="language-bash">npm run <span class="hljs-built_in">test</span></code></pre>
+				<a href="#books-docs" id="books-docs" style="color: inherit; text-decoration: none;">
+					<h2>:books: Docs</h2>
+				</a>
+				<p>See <code>docs/index.html</code> for complete docs.</p>
 				<a href="#gear-config" id="gear-config" style="color: inherit; text-decoration: none;">
 					<h2>:gear: Config</h2>
 				</a>
@@ -116,7 +124,7 @@ pool.get() <span class="hljs-comment">// returns an Entity</span></code></pre>
 					<h3>min</h3>
 				</a>
 				<p>The minimum capacity of the pool. Cannot be less than 1.</p>
-				<p>This is the minimum capacity, not the minimum available. The minimum available objects is always 0.</p>
+				<p>This is the minimum capacity, not the minimum available objects. The minimum available objects is always 0.</p>
 				<a href="#max" id="max" style="color: inherit; text-decoration: none;">
 					<h3>max</h3>
 				</a>
@@ -127,10 +135,6 @@ pool.get() <span class="hljs-comment">// returns an Entity</span></code></pre>
 				<p>If true, pool elements are reused if maximum capacity is reached.</p>
 				<p>If false, and the pool is at maximum capacity, <code>get()</code> will return undefined.</p>
 				<p>Ignored if max is undefined.</p>
-				<a href="#books-docs" id="books-docs" style="color: inherit; text-decoration: none;">
-					<h2>:books: Docs</h2>
-				</a>
-				<p>See <code>./docs/index.html</code></p>
 				<a href="#sparkles-contributing" id="sparkles-contributing" style="color: inherit; text-decoration: none;">
 					<h2>:sparkles: Contributing</h2>
 				</a>
