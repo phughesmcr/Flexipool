@@ -2,6 +2,9 @@
 "use strict";
 
 export interface PoolConfig {
+  /** Print console messages to aid debugging */
+  debug: boolean;
+
   /**
    * Percentage to attempt to expand the pool by,
    * if pool is at capacity but not at maximum capacity
@@ -41,9 +44,10 @@ export interface Poolable {
 export class Pool<T extends Poolable> {
   /** Default configuration object */
   static defaultConfig: PoolConfig = {
+    debug: false,
     expandFactor: 0.2, // i.e. expand by 20%
-    min: 2,
     max: Number.POSITIVE_INFINITY,
+    min: 2,
     recycle: false,
   };
 
@@ -89,6 +93,11 @@ export class Pool<T extends Poolable> {
     return { ...this._config };
   }
 
+  /** Is debug mode enabled? */
+  get debug(): boolean {
+    return this._config.debug;
+  }
+
   /** The pool's maximum capacity. */
   get max(): number {
     return this._config.max;
@@ -127,9 +136,13 @@ export class Pool<T extends Poolable> {
    */
   expandBy(size: number): this {
     // Bail early if the pool is already at maximum capacity
-    if (size == null || typeof size !== "number" || this.atMax === true) {
+    if (size == null || typeof size !== "number") {
+      if (this.debug) {
+        console.warn(`Flexipool[expandBy()]: Invalid size supplied. Expected 'number', got ${typeof size}. Ignoring.`);
+      }
       return this;
     }
+    if (this.atMax === true) return this;
     // Grow to available space if near maximum capacity
     if (this._config.max && ((this._size + size) > this._config.max)) {
       size = this._config.max - this._size;
@@ -157,7 +170,12 @@ export class Pool<T extends Poolable> {
 
   /** Resets a given object and makes it available in the pool */
   release(item: T): this {
-    if (item == null || !(item instanceof this.type)) return this;
+    if (item == null || !(item instanceof this.type)) {
+      if (this.debug) {
+        console.warn(`Flexipool[release()]: Invalid item supplied. Ignoring.`);
+      }
+      return this;
+    }
     // Reset the object if possible
     if (
       Object.prototype.hasOwnProperty.call(item, "reset") &&
@@ -177,7 +195,12 @@ export class Pool<T extends Poolable> {
    * @param size The desired capacity
    */
   resizeTo(size: number): this {
-    if (size == null || typeof size !== "number") return this;
+    if (size == null || typeof size !== "number") {
+      if (this.debug) {
+        console.warn(`Flexipool[resizeTo()]: Invalid size supplied. Expected 'number', got ${typeof size}. Ignoring.`);
+      }
+      return this;
+    }
     if (size !== this._size) {
       if (size > this._size) {
         size = (size - this._size);
@@ -193,21 +216,48 @@ export class Pool<T extends Poolable> {
   /** Update the pool's configuration */
   setConfig(config: Partial<PoolConfig>): this {
     // validate input
-    if (!config) return this;
+    if (!config) {
+      if (this.debug) {
+        console.warn(
+          "Flexipool[setConfig()]: No config object supplied. Ignoring.",
+        );
+      }
+      return this;
+    }
     if (config.min != null) {
       if (typeof config.min !== "number") {
+        if (this.debug) {
+          console.warn(
+            `Flexipool[setConfig()]: Invalid config property type supplied for 'min'. Expected 'number', got ${typeof config.min}. Ignoring.`,
+          );
+        }
         delete config.min;
       } else if (config.min <= 0) {
+        if (this.debug) {
+          console.warn(
+            `Flexipool[setConfig()]: Invalid config property supplied for 'min'. Expected >= 1, got ${config.min}. Setting to 1.`,
+          );
+        }
         config.min = 1;
       }
     }
     if (config.max != null) {
       if (typeof config.max !== "number") {
+        if (this.debug) {
+          console.warn(
+            `Flexipool[setConfig()]: Invalid config property type supplied for 'max'. Expected 'number', got ${typeof config.max}. Ignoring.`,
+          );
+        }
         delete config.max;
       } else if (
         config.max <
           (config.min != null ? config.min : this._config.min)
       ) {
+        if (this.debug) {
+          console.warn(
+            `Flexipool[setConfig()]: Invalid config property supplied for 'max'. Expected >= ${config.min != null ? config.min : this._config.min}, got ${config.max}. Ignoring.`,
+          );
+        }
         delete config.max;
       }
     }
@@ -215,9 +265,19 @@ export class Pool<T extends Poolable> {
       config.expandFactor != null &&
       typeof config.expandFactor !== "number"
     ) {
+      if (this.debug) {
+        console.warn(
+          `Flexipool[setConfig()]: Invalid config property type supplied for 'expandFactor'. Expected 'number', got ${typeof config.expandFactor}. Ignoring.`,
+        );
+      }
       delete config.expandFactor;
     }
     if (config.recycle && typeof config.recycle !== "boolean") {
+      if (this.debug) {
+        console.warn(
+          `Flexipool[setConfig()]: Invalid config property type supplied for 'recycle'. Expected 'boolean', got ${typeof config.recycle}. Ignoring.`,
+        );
+      }
       delete config.recycle;
     }
     // detect changes to min/max
@@ -250,9 +310,13 @@ export class Pool<T extends Poolable> {
    */
   shrinkBy(size: number): this {
     // Bail early if the pool is already at minimum capacity
-    if (size == null || typeof size !== "number" || this.atMin === true) {
+    if (size == null || typeof size !== "number") {
+      if (this.debug) {
+        console.warn(`Flexipool[shrinkBy()]: Invalid size supplied. Expected 'number', got ${typeof size}. Ignoring.`);
+      }
       return this;
     }
+    if (this.atMin === true) return this;
     // Grow to available space if near maximum capacity
     if ((this._size - size) < this._config.min) {
       return this.resizeTo(this._config.min);
