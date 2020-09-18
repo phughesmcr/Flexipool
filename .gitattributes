@@ -1,6 +1,7 @@
 *                 text=auto eol=lf
 
-docs/             linguist-generated=true
+dist/*            linguist-generated=true
+docs/*            linguist-documentation=true
 
 *.css             text
 *.htm             text diff=html
