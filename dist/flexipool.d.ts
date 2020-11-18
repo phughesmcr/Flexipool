@@ -27,12 +27,30 @@ export interface PoolConfig {
     recycle: boolean;
 }
 /** Generic interface for poolable objects */
-export interface Poolable {
+export interface Disposable {
     /** Reset the object to it's initial state */
-    reset?: () => void;
+    destroy: () => void;
+    /** Is the object in a destroyed state? */
+    destroyed: boolean;
+}
+export interface Poolable<T extends Poolable<T>> {
+    /** Poolable instance constructor */
+    new (...args: never[]): T;
+    /** The pool this instance belongs to */
+    pool: Pool<T>;
+}
+export declare abstract class Poolable<T> implements Disposable {
+    /** Is this instance in a destroyed state? */
+    private _destroyed;
+    /** Is this instance in a destroyed state? */
+    get destroyed(): boolean;
+    /** Return this instance to  */
+    destroy: () => void;
+    /** Override this with your instance implementation */
+    abstract _onDispose(): void;
 }
 /** Generic object pool */
-export declare class Pool<T extends Poolable> {
+export declare class Pool<T extends Poolable<T>> {
     /** Default configuration object */
     static defaultConfig: PoolConfig;
     /** The pool's configuration */
@@ -42,12 +60,12 @@ export declare class Pool<T extends Poolable> {
     /** The current capacity of the pool */
     private _size;
     /** The type of object this pool contains */
-    readonly type: new () => T;
+    readonly type: T;
     /**
      * @param type Object type this pool will contain
      * @param config Optional configuration object
      */
-    constructor(type: new () => T, config?: Partial<PoolConfig>);
+    constructor(type: (new (...args: never[]) => T), config?: Partial<PoolConfig>);
     /** Is the pool at maximum capacity? */
     get atMax(): boolean;
     /** Is the pool at minimum capacity? */
@@ -66,6 +84,8 @@ export declare class Pool<T extends Poolable> {
     get size(): number;
     /** The number of objects in use from this pool */
     get used(): number;
+    /** Pool typeguard */
+    isOfPoolType(item: unknown): item is T;
     /**
      * Remove all objects from the pool
      * and resets the pool's size to minimum

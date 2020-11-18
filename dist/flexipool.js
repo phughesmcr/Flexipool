@@ -1,5 +1,28 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 // Copyright (c) 2020 P. Hughes. All rights reserved. MIT license.
 "use strict";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export class Poolable {
+    constructor() {
+        /** Is this instance in a destroyed state? */
+        this._destroyed = true;
+        /** Return this instance to  */
+        this.destroy = () => {
+            this._destroyed = true;
+            try {
+                this._onDispose();
+            }
+            catch (err) {
+                console.warn(err);
+            }
+        };
+    }
+    /** Is this instance in a destroyed state? */
+    get destroyed() {
+        return this._destroyed;
+    }
+}
 /** Generic object pool */
 export class Pool {
     /**
@@ -13,9 +36,10 @@ export class Pool {
         this._objects = [];
         /** The current capacity of the pool */
         this._size = 0;
+        this.type = new type();
+        this.type.pool = this;
         if (config)
             this.setConfig(config);
-        this.type = type;
         this.empty();
     }
     /** Is the pool at maximum capacity? */
@@ -54,13 +78,23 @@ export class Pool {
     get used() {
         return this.size - this.available;
     }
+    /** Pool typeguard */
+    isOfPoolType(item) {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            return Object.getPrototypeOf(item).constructor === Object.getPrototypeOf(this.type).constructor;
+        }
+        catch (_err) {
+            return false;
+        }
+    }
     /**
      * Remove all objects from the pool
      * and resets the pool's size to minimum
      */
     empty() {
         this._size = 0;
-        this._objects = [];
+        this._objects.length = 0;
         this.resizeTo(this._config.min);
         return this;
     }
@@ -86,7 +120,9 @@ export class Pool {
         this._size += size;
         while (size) {
             --size;
-            this._objects.push(new this.type());
+            const clone = new (Object.getPrototypeOf(this.type).constructor);
+            clone.pool = this;
+            this._objects.push(clone);
         }
         return this;
     }
@@ -104,7 +140,7 @@ export class Pool {
     }
     /** Resets a given object and makes it available in the pool */
     release(item) {
-        if (item == null || !(item instanceof this.type)) {
+        if (item == null || Object.getPrototypeOf(item).constructor !== Object.getPrototypeOf(this.type).constructor) {
             if (this.debug) {
                 console.warn(`Flexipool[release()]: Invalid item supplied. Ignoring.`);
             }
@@ -112,8 +148,15 @@ export class Pool {
         }
         // Reset the object if possible
         if (Object.prototype.hasOwnProperty.call(item, "reset") &&
-            typeof item.reset === "function") {
-            item.reset();
+            typeof item.destroy === "function") {
+            try {
+                item.destroy();
+            }
+            catch (err) {
+                if (this.debug) {
+                    console.warn(`Flexipool[release()]: Error when calling destroy() on item.`, item);
+                }
+            }
         }
         // Only push if we're not already fully free or at maximum capacity
         if (this.available < this._size || this.atMax === false) {
@@ -233,7 +276,8 @@ export class Pool {
             return this.resizeTo(this._config.min);
         }
         this._size -= size;
-        this._objects.splice(0, size);
+        this._objects.length = this._size;
+        //this._objects.splice(0, size);
         return this;
     }
 }
@@ -241,7 +285,7 @@ export class Pool {
 Pool.defaultConfig = {
     debug: false,
     expandFactor: 0.2,
-    max: Number.POSITIVE_INFINITY,
+    max: 65536,
     min: 2,
     recycle: false,
 };
