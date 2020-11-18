@@ -8,10 +8,11 @@
 <body>
     <p>See console.</p>
     <script type="module">
-      import { Pool } from '../dist/flexipool.js';
-      class Entity {
-        constructor() { }
-        reset() { }
+      import { Pool, Poolable } from '../dist/flexipool.js';
+      class Entity extends Poolable {
+        constructor() {
+          super();
+        }
       }
       window.entity = Entity;
       window.pool = new Pool(Entity);

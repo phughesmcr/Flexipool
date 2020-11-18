@@ -4,9 +4,10 @@
 import { Pool, Poolable } from '../dist/flexipool.js';
 import { expect } from 'chai';
 
-class Entity implements Poolable {
-  constructor() {}
-  reset() {}
+class Entity extends Poolable<Entity> {
+  constructor() {
+    super();
+  }
 }
 const pool: Pool<Entity> = new Pool(Entity, {debug: true});
 
@@ -20,7 +21,7 @@ describe('new Pool()', () => {
     expect(pool.config).to.not.equal(undefined);
     expect(pool.config.debug).to.equal(true);
     expect(pool.config.expandFactor).to.equal(0.2);
-    expect(pool.config.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.config.max).to.equal(65536);
     expect(pool.config.min).to.equal(2);
     expect(pool.config.recycle).to.equal(false);
   });
@@ -29,11 +30,11 @@ describe('new Pool()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(true);
     expect(pool.available).to.equal(2);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(2);
     expect(pool.used).to.equal(0);
-    expect(pool.type).to.equal(Entity);
+    expect(pool.type).to.be.an.instanceof(Entity);
   });
 });
 
@@ -43,7 +44,7 @@ describe('expandBy()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(false);
     expect(pool.available).to.equal(4);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(4);
     expect(pool.used).to.equal(0);
@@ -54,7 +55,7 @@ describe('expandBy()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(false);
     expect(pool.available).to.equal(4);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(4);
     expect(pool.used).to.equal(0);
@@ -65,7 +66,7 @@ describe('expandBy()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(false);
     expect(pool.available).to.equal(4);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(4);
     expect(pool.used).to.equal(0);
@@ -78,7 +79,7 @@ describe('shrinkBy()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(true);
     expect(pool.available).to.equal(2);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(2);
     expect(pool.used).to.equal(0);
@@ -89,7 +90,7 @@ describe('shrinkBy()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(true);
     expect(pool.available).to.equal(2);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(2);
     expect(pool.used).to.equal(0);
@@ -100,7 +101,7 @@ describe('shrinkBy()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(true);
     expect(pool.available).to.equal(2);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(2);
     expect(pool.used).to.equal(0);
@@ -111,7 +112,7 @@ describe('shrinkBy()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(true);
     expect(pool.available).to.equal(2);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(2);
     expect(pool.used).to.equal(0);
@@ -124,7 +125,7 @@ describe('resizeTo()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(false);
     expect(pool.available).to.equal(10);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(10);
     expect(pool.used).to.equal(0);
@@ -135,7 +136,7 @@ describe('resizeTo()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(true);
     expect(pool.available).to.equal(2);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(2);
     expect(pool.used).to.equal(0);
@@ -146,7 +147,7 @@ describe('resizeTo()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(true);
     expect(pool.available).to.equal(2);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(2);
     expect(pool.used).to.equal(0);
@@ -157,7 +158,7 @@ describe('resizeTo()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(false);
     expect(pool.available).to.equal(100);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(100);
     expect(pool.used).to.equal(0);
@@ -170,7 +171,7 @@ describe('empty()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(true);
     expect(pool.available).to.equal(2);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(2);
     expect(pool.used).to.equal(0);
@@ -187,7 +188,7 @@ describe('get()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(true);
     expect(pool.available).to.equal(1);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(2);
     expect(pool.used).to.equal(1);
@@ -198,7 +199,7 @@ describe('get()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(true);
     expect(pool.available).to.equal(0);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(2);
     expect(pool.used).to.equal(2);
@@ -209,7 +210,7 @@ describe('get()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(false);
     expect(pool.available).to.equal(0);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(3);
     expect(pool.used).to.equal(3);
@@ -222,7 +223,7 @@ describe('release()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(false);
     expect(pool.available).to.equal(1);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(3);
     expect(pool.used).to.equal(2);
@@ -233,7 +234,7 @@ describe('release()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(false);
     expect(pool.available).to.equal(2);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(3);
     expect(pool.used).to.equal(1);
@@ -244,7 +245,7 @@ describe('release()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(false);
     expect(pool.available).to.equal(3);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(3);
     expect(pool.used).to.equal(0);
@@ -255,10 +256,11 @@ describe('release()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(false);
     expect(pool.available).to.equal(3);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(3);
     expect(pool.used).to.equal(0);
+
   });
 
   it('should attempt to release nothing back to the pool and fail' , () => {
@@ -266,7 +268,7 @@ describe('release()', () => {
     expect(pool.atMax).to.equal(false);
     expect(pool.atMin).to.equal(false);
     expect(pool.available).to.equal(3);
-    expect(pool.max).to.equal(Number.POSITIVE_INFINITY);
+    expect(pool.max).to.equal(65536);
     expect(pool.min).to.equal(2);
     expect(pool.size).to.equal(3);
     expect(pool.used).to.equal(0);
@@ -295,6 +297,7 @@ describe('setConfig()', () => {
     expect(pool.config.max).to.equal(10);
     expect(pool.size).to.equal(4);
   });
+
 
   it('should attempt to expand beyond the maximum capacity and fail' , () => {
     pool.expandBy(100);

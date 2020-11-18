@@ -9,8 +9,15 @@ An generic object pool written in Typescript, compatible with Browser, Node & De
 ```typescript
 import { Pool, Poolable } from "flexipool.ts";
 
-class Entity implements Poolable {
-  // ...
+class Entity implements Poolable<Entity> {
+  constructor() {
+    super();
+  }
+
+  // called when entity.destroy() is called
+  _onDispose() {
+    // your code here
+  }
 }
 
 const pool: Pool<Entity> = new Pool(Entity);
@@ -28,10 +35,15 @@ pool.release(item);
 ```javascript
 import { Pool } from "flexipool.js";
 
-class Entity {
-  constructor() {}
-  reset() {}
-  // ...
+class Entity implements Poolable<Entity> {
+  constructor() {
+    super();
+  }
+
+  // called when entity.destroy() is called
+  _onDispose() {
+    // your code here
+  }
 }
 
 const pool = new Pool(Entity);

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 // Copyright (c) 2020 P. Hughes. All rights reserved. MIT license.
 "use strict";
 
@@ -35,18 +37,54 @@ export interface PoolConfig {
 }
 
 /** Generic interface for poolable objects */
-export interface Poolable {
+export interface Disposable {
   /** Reset the object to it's initial state */
-  reset?: () => void;
+  destroy: () => void;
+
+  /** Is the object in a destroyed state? */
+  destroyed: boolean;
+}
+
+export interface Poolable<T extends Poolable<T>> {
+  /** Poolable instance constructor */
+  new(...args: never[]): T;
+
+  /** The pool this instance belongs to */
+  pool: Pool<T>;
+}
+
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export abstract class Poolable<T> implements Disposable {
+  /** Is this instance in a destroyed state? */
+  private _destroyed = true;
+
+  /** Is this instance in a destroyed state? */
+  get destroyed(): boolean {
+    return this._destroyed;
+  }
+
+  /** Return this instance to  */
+  destroy = (): void => {
+    this._destroyed = true;
+    try {
+      this._onDispose();
+    } catch(err) {
+      console.warn(err);
+    }
+  }
+
+  /** Override this with your instance implementation */
+  abstract _onDispose(): void;
 }
 
 /** Generic object pool */
-export class Pool<T extends Poolable> {
+export class Pool<T extends Poolable<T>> {
   /** Default configuration object */
   static defaultConfig: PoolConfig = {
     debug: false,
     expandFactor: 0.2, // i.e. expand by 20%
-    max: Number.POSITIVE_INFINITY,
+    max: 65536, // 256^2
     min: 2,
     recycle: false,
   };
@@ -61,15 +99,16 @@ export class Pool<T extends Poolable> {
   private _size = 0;
 
   /** The type of object this pool contains */
-  readonly type: new () => T;
+  readonly type: T;
 
   /**
    * @param type Object type this pool will contain
    * @param config Optional configuration object
    */
-  constructor(type: new () => T, config?: Partial<PoolConfig>) {
+  constructor(type: (new (...args: never[]) => T), config?: Partial<PoolConfig>) {
+    this.type = new type();
+    this.type.pool = this;
     if (config) this.setConfig(config);
-    this.type = type;
     this.empty();
   }
 
@@ -118,13 +157,23 @@ export class Pool<T extends Poolable> {
     return this.size - this.available;
   }
 
+  /** Pool typeguard */
+  isOfPoolType(item: unknown): item is T {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      return Object.getPrototypeOf(item).constructor ===  Object.getPrototypeOf(this.type).constructor;
+    } catch(_err) {
+      return false;
+    }
+  }
+
   /**
    * Remove all objects from the pool
    * and resets the pool's size to minimum
    */
   empty(): this {
     this._size = 0;
-    this._objects = [];
+    this._objects.length = 0;
     this.resizeTo(this._config.min);
     return this;
   }
@@ -150,7 +199,9 @@ export class Pool<T extends Poolable> {
     this._size += size;
     while (size) {
       --size;
-      this._objects.push(new this.type());
+      const clone = new (Object.getPrototypeOf(this.type).constructor) as T;
+      clone.pool = this;
+      this._objects.push(clone);
     }
     return this;
   }
@@ -170,7 +221,7 @@ export class Pool<T extends Poolable> {
 
   /** Resets a given object and makes it available in the pool */
   release(item: T): this {
-    if (item == null || !(item instanceof this.type)) {
+    if (item == null || Object.getPrototypeOf(item).constructor !== Object.getPrototypeOf(this.type).constructor) {
       if (this.debug) {
         console.warn(`Flexipool[release()]: Invalid item supplied. Ignoring.`);
       }
@@ -179,9 +230,15 @@ export class Pool<T extends Poolable> {
     // Reset the object if possible
     if (
       Object.prototype.hasOwnProperty.call(item, "reset") &&
-      typeof item.reset === "function"
+      typeof item.destroy === "function"
     ) {
-      item.reset();
+      try {
+        item.destroy();
+      } catch (err) {
+        if (this.debug) {
+          console.warn(`Flexipool[release()]: Error when calling destroy() on item.`, item);
+        }
+      }
     }
     // Only push if we're not already fully free or at maximum capacity
     if (this.available < this._size || this.atMax === false) {
@@ -322,7 +379,8 @@ export class Pool<T extends Poolable> {
       return this.resizeTo(this._config.min);
     }
     this._size -= size;
-    this._objects.splice(0, size);
+    this._objects.length = this._size;
+    //this._objects.splice(0, size);
     return this;
   }
 }
