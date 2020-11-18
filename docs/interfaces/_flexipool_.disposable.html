@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Poolable | flexipool</title>
+	<title>Disposable | flexipool</title>
 	<meta name="description" content="Documentation for flexipool">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -59,10 +59,10 @@
 					<a href="../modules/_flexipool_.html">&quot;flexipool&quot;</a>
 				</li>
 				<li>
-					<a href="_flexipool_.poolable.html">Poolable</a>
+					<a href="_flexipool_.disposable.html">Disposable</a>
 				</li>
 			</ul>
-			<h1>Interface Poolable</h1>
+			<h1>Interface Disposable</h1>
 		</div>
 	</div>
 </header>
@@ -80,8 +80,14 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Poolable</span>
+						<span class="target">Disposable</span>
 					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel">
+				<h3>Implemented by</h3>
+				<ul class="tsd-hierarchy">
+					<li><a href="../classes/_flexipool_.poolable.html" class="tsd-signature-type">Poolable</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -91,7 +97,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_flexipool_.poolable.html#reset" class="tsd-kind-icon">reset</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_flexipool_.disposable.html#destroy" class="tsd-kind-icon">destroy</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_flexipool_.disposable.html#destroyed" class="tsd-kind-icon">destroyed</a></li>
 							</ul>
 						</section>
 					</div>
@@ -100,17 +107,47 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="reset" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> reset</h3>
-					<div class="tsd-signature tsd-kind-icon">reset<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></div>
+					<a name="destroy" class="tsd-anchor"></a>
+					<h3>destroy</h3>
+					<div class="tsd-signature tsd-kind-icon">destroy<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/phughesmcr/Flexipool/blob/4d50425/flexipool.ts#L40">flexipool.ts:40</a></li>
+							<li>Defined in <a href="https://github.com/phughesmcr/Flexipool/blob/15d370b/flexipool.ts#L42">flexipool.ts:42</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>Reset the object to it&#39;s initial state</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="destroyed" class="tsd-anchor"></a>
+					<h3>destroyed</h3>
+					<div class="tsd-signature tsd-kind-icon">destroyed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/phughesmcr/Flexipool/blob/15d370b/flexipool.ts#L45">flexipool.ts:45</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Is the object in a destroyed state?</p>
 						</div>
 					</div>
 				</section>
@@ -132,21 +169,27 @@
 					<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
 						<a href="../classes/_flexipool_.pool.html" class="tsd-kind-icon">Pool</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_flexipool_.poolconfig.html" class="tsd-kind-icon">Pool<wbr>Config</a>
+					<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="../classes/_flexipool_.poolable.html" class="tsd-kind-icon">Poolable</a>
 					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="_flexipool_.poolable.html" class="tsd-kind-icon">Poolable</a>
+						<a href="_flexipool_.disposable.html" class="tsd-kind-icon">Disposable</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_flexipool_.poolable.html#reset" class="tsd-kind-icon">reset</a>
+								<a href="_flexipool_.disposable.html#destroy" class="tsd-kind-icon">destroy</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_flexipool_.disposable.html#destroyed" class="tsd-kind-icon">destroyed</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_flexipool_.poolconfig.html" class="tsd-kind-icon">Pool<wbr>Config</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
